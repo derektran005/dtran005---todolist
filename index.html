@@ -9,15 +9,14 @@
   <main class="container">
     <h1>To-Do List</h1>
 
-    <form id="todo-form">
-      <input
-        type="text"
-        id="todo-input"
-        placeholder="Enter a task"
-        required
-      />
-      <button type="submit">Add</button>
-    </form>
+<form id="todo-form">
+  <input id="todo-input" type="text" placeholder="Task" required />
+  <input id="todo-date" type="date" />
+  <input id="todo-group" type="text" placeholder="Group (optional)" />
+  <button type="submit">Add</button>
+</form>
+
+<div id="groups"></div>
 
     <ul id="todo-list"></ul>
   </main>

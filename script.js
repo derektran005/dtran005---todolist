@@ -1,56 +1,114 @@
 const form = document.getElementById("todo-form");
 const input = document.getElementById("todo-input");
-const list = document.getElementById("todo-list");
+const dateInput = document.getElementById("todo-date");
+const groupInput = document.getElementById("todo-group");
+const groupsDiv = document.getElementById("groups");
 
 let todos = JSON.parse(localStorage.getItem("todos")) || [];
+let collapsedGroups = JSON.parse(localStorage.getItem("collapsedGroups")) || {};
 
-function saveTodos() {
+function save() {
   localStorage.setItem("todos", JSON.stringify(todos));
+  localStorage.setItem("collapsedGroups", JSON.stringify(collapsedGroups));
 }
 
-function renderTodos() {
-  list.innerHTML = "";
+function groupTodos() {
+  return todos.reduce((acc, todo) => {
+    acc[todo.group] = acc[todo.group] || [];
+    acc[todo.group].push(todo);
+    return acc;
+  }, {});
+}
 
-  todos.forEach((todo, index) => {
-    const li = document.createElement("li");
+function render() {
+  groupsDiv.innerHTML = "";
+  const grouped = groupTodos();
 
-    const span = document.createElement("span");
-    span.textContent = todo.text;
-    if (todo.completed) {
-      span.classList.add("completed");
+  Object.keys(grouped).forEach(group => {
+    const groupDiv = document.createElement("div");
+    groupDiv.className = "group";
+
+    const header = document.createElement("div");
+    header.className = "group-header";
+    header.textContent = group || "Ungrouped";
+    header.onclick = () => {
+      collapsedGroups[group] = !collapsedGroups[group];
+      save();
+      render();
+    };
+
+    groupDiv.appendChild(header);
+
+    if (!collapsedGroups[group]) {
+      grouped[group].forEach((todo, index) => {
+        const item = document.createElement("div");
+        item.className = "todo-item";
+        if (todo.completed) item.classList.add("completed");
+
+        item.draggable = true;
+        item.ondragstart = e => e.dataTransfer.setData("id", todo.id);
+        item.ondragover = e => e.preventDefault();
+        item.ondrop = e => {
+          const draggedId = e.dataTransfer.getData("id");
+          moveTodo(draggedId, todo.id);
+        };
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = todo.completed;
+        checkbox.onchange = () => {
+          todo.completed = checkbox.checked;
+          save();
+          render();
+        };
+
+        const span = document.createElement("span");
+        span.textContent = `${todo.text}${todo.dueDate ? " (Due: " + todo.dueDate + ")" : ""}`;
+
+        const del = document.createElement("button");
+        del.textContent = "X";
+        del.onclick = () => {
+          todos = todos.filter(t => t.id !== todo.id);
+          save();
+          render();
+        };
+
+        const drag = document.createElement("span");
+        drag.textContent = "≡";
+        drag.className = "drag-handle";
+
+        item.append(checkbox, drag, span, del);
+        groupDiv.appendChild(item);
+      });
     }
 
-    span.addEventListener("click", () => {
-      todos[index].completed = !todos[index].completed;
-      saveTodos();
-      renderTodos();
-    });
-
-    const deleteBtn = document.createElement("button");
-    deleteBtn.textContent = "Delete";
-    deleteBtn.addEventListener("click", () => {
-      todos.splice(index, 1);
-      saveTodos();
-      renderTodos();
-    });
-
-    li.appendChild(span);
-    li.appendChild(deleteBtn);
-    list.appendChild(li);
+    groupsDiv.appendChild(groupDiv);
   });
 }
 
-form.addEventListener("submit", (e) => {
+function moveTodo(fromId, toId) {
+  const fromIndex = todos.findIndex(t => t.id === fromId);
+  const toIndex = todos.findIndex(t => t.id === toId);
+  const [moved] = todos.splice(fromIndex, 1);
+  todos.splice(toIndex, 0, moved);
+  save();
+  render();
+}
+
+form.onsubmit = e => {
   e.preventDefault();
 
   todos.push({
+    id: crypto.randomUUID(),
     text: input.value.trim(),
-    completed: false
+    completed: false,
+    dueDate: dateInput.value || null,
+    group: groupInput.value.trim() || "Ungrouped"
   });
 
-  input.value = "";
-  saveTodos();
-  renderTodos();
-});
+  form.reset();
+  save();
+  render();
+};
 
-renderTodos();
+render();
