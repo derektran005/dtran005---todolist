@@ -12,18 +12,30 @@
         <div class = "todo-app">
             <h2>To Do List</h2>
 
-            <div class = "row">
-                <input type="text" id="input-box" placeholder="Add new task">
-                <input type="date" id="input-date">
-                <button onclick="addTask()">Add Task</button>
-
+            
+            <div class="row">
+                <input type="text" id="group-box" placeholder="Add a new group" maxlength="30">
+                <button onclick="addGroup()">Add Group</button>
             </div>
 
-            <ul id="list-container">
-            </ul>
+            <div class = "row">
+                <input type="text" id="input-box" maxlength="30" placeholder="Add new task" required>
+                
 
+                <input type="date" id="input-date">
+                
+                <select id="group-select">
+                    <option value="default">Ungrouped</option>
+                </select>
+
+                <button onclick="addTask()">Add Task</button>
+            </div>
+
+
+
+            <div id="groups-container">
+                
         </div>
-
     </div>
 <script src="script.js"></script>
 </body>
