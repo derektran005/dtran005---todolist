@@ -58,6 +58,17 @@ button {
     border-radius: 40px;
 }
 
+#group-select {
+    
+    padding: 6px 6x;
+    color: #333333;
+    background-color: #ffffff;
+    border: 1px solid #dddddd;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+
 .group-section {
     margin-top: 12px;
     display: flex;

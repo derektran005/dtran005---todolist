@@ -94,7 +94,7 @@ function createGroupSection(groupName) {
     header.className = "group-header";
 
     const title = document.createElement("h3");
-    title.textContent = groupName === "default" ? "Ungrouped" : groupName;
+    title.textContent = groupName === "default" ? "Ungrouped Tasks" : groupName;
 
     const deleteBtn = document.createElement("button");
     deleteBtn.className = "group-delete";
@@ -127,7 +127,7 @@ function updateGroupDropdown() {
     groups.forEach(group => {
         const option = document.createElement("option");
         option.value = group;
-        option.textContent = group === "default" ? "Ungrouped" : group;
+        option.textContent = group === "default" ? "Ungrouped Tasks" : group;
         select.appendChild(option);
     });
 }
